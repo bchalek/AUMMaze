@@ -156,6 +156,7 @@ namespace AUMMaze.Services
 		private List<Point> FindWayBack(Point start, Point end)
 		{
 			List<Point> route = new List<Point>();
+
 			if (mazePointsCollection.Any(obj => obj.ActualPoint.Equals(end)))
 			{
 				Point actualPoint = end;
@@ -165,6 +166,10 @@ namespace AUMMaze.Services
 					actualPoint = mazePointsCollection.FirstOrDefault(obj => obj.ActualPoint.Equals(actualPoint)).PreviousPoint.Value;
 					route.Insert(0, actualPoint);
 				}
+			}
+			else
+			{
+				throw new Exception("Nie znaleziono drogi do wyjścia");
 			}
 			return route;
 		}

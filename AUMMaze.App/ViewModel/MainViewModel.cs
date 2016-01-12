@@ -141,21 +141,33 @@ namespace AUMMaze.App.ViewModel
 
 		private void GetMazeExecute()
 		{
-			OpenFileDialog openFileDialog = new OpenFileDialog();
-			bool? dialogResult = openFileDialog.ShowDialog();
-			if (dialogResult.GetValueOrDefault())
+			try
 			{
-				fileName = openFileDialog.FileName;
-				mazeBitmap = MazeService.DrawMaze(fileName);
-				System.IO.MemoryStream ms = new System.IO.MemoryStream();
-				mazeBitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
-				ms.Position = 0;
-				BitmapImage bi = new BitmapImage();
-				bi.BeginInit();
-				bi.StreamSource = ms;
-				bi.EndInit();
-				MazeImage = bi;
+				OpenFileDialog openFileDialog = new OpenFileDialog();
+				bool? dialogResult = openFileDialog.ShowDialog();
+				if (dialogResult.GetValueOrDefault())
+				{
+					fileName = openFileDialog.FileName;
+					mazeBitmap = MazeService.DrawMaze(fileName);
+					MazeImage = DrawBitmapImage(mazeBitmap);
+				}
 			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(ex.Message);
+			}
+		}
+
+		private BitmapImage DrawBitmapImage(System.Drawing.Bitmap bitmap)
+		{
+			System.IO.MemoryStream ms = new System.IO.MemoryStream();
+			bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+			ms.Position = 0;
+			BitmapImage bitmapImage = new BitmapImage();
+			bitmapImage.BeginInit();
+			bitmapImage.StreamSource = ms;
+			bitmapImage.EndInit();
+			return bitmapImage;
 		}
 
 		private void CreateSolveMazeCommand()
@@ -165,16 +177,16 @@ namespace AUMMaze.App.ViewModel
 
 		private void SolveMazeExecute()
 		{
+			try
+			{
+				System.Drawing.Bitmap newMazeBitmap = MazeService.SolveAndDrawSolution(fileName, new Point(StartX.Value, StartY.Value), new Point(EndX.Value, EndY.Value), mazeBitmap);
 
-			System.Drawing.Bitmap newMazeBitmap = MazeService.SolveAndDrawSolution(fileName, new Point(StartX.Value, StartY.Value), new Point(EndX.Value, EndY.Value), mazeBitmap);
-			System.IO.MemoryStream ms = new System.IO.MemoryStream();
-			newMazeBitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
-			ms.Position = 0;
-			BitmapImage bi = new BitmapImage();
-			bi.BeginInit();
-			bi.StreamSource = ms;
-			bi.EndInit();
-			MazeImage = bi;
+				MazeImage = DrawBitmapImage(newMazeBitmap);
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(ex.Message);
+			}
 		}
 
 		public bool CanSolveMazeExecute()
